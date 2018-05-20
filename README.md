@@ -20,7 +20,9 @@ Add a [Photon Battery Shield](https://www.sparkfun.com/products/13626) and [lith
 
 ![wiring](images/wiring.png)
 
-For the complete schematic, open the [air-quality.fzz](https://github.com/blackcj/SparkFunCCS811/blob/master/images/air-quality.fzz) file in [Fritzing](http://fritzing.org/home/).
+For the complete schematic, open the [air-quality.fzz](https://github.com/blackcj/SparkFunCCS811/blob/master/images/air_quality.fzz) file in [Fritzing](http://fritzing.org/home/).
+
+![project image](images/project-image.jpg)
 
 ## Instructions
 
