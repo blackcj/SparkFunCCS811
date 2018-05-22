@@ -1,0 +1,28 @@
+{
+  "name": "SparkFunCCS811",
+  "version": "1.0.0",
+  "description": "The CCS811 is a sensor for monitoring indoor air quality. There are a number of configuration settings that make this sensor tricky to get up and running correctly. In this example we'll go over all of the steps I took to get readings from the CCS811 using a Particle Photon and a Si7021 temperature sensor.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blackcj/SparkFunCCS811.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/blackcj/SparkFunCCS811/issues"
+  },
+  "homepage": "https://github.com/blackcj/SparkFunCCS811#readme",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "dotenv": "^5.0.1",
+    "express": "^4.16.3",
+    "node-cron": "^1.2.1",
+    "pg": "^7.4.3"
+  }
+}
