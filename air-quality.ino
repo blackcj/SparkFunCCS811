@@ -13,7 +13,8 @@
 SYSTEM_MODE(SEMI_AUTOMATIC);
 SYSTEM_THREAD(ENABLED);
 //STARTUP(WiFi.selectAntenna(ANT_AUTO)); // continually switches at high speed between antennas
-STARTUP(WiFi.selectAntenna(ANT_EXTERNAL)); // selects the u.FL antenna
+//STARTUP(WiFi.selectAntenna(ANT_EXTERNAL)); // selects the u.FL antenna
+STARTUP(WiFi.selectAntenna(ANT_INTERNAL));
 
 CCS811 myCCS811(CCS811_ADDR);
 Adafruit_Si7021 sensor = Adafruit_Si7021();
@@ -31,7 +32,7 @@ uint32_t startTime; // Time we booted up the device
 
 void setup() {
     // SEMI-AUTOMATIC mode allows us to read oled even without a cloud connection.
-    // This is good for measurements on the go.
+    // This is good for measurements on the go (no WiFi).
     Particle.connect();
     if (!waitFor(Particle.connected, msRetryTime)) { // Wait for 30 seconds
         WiFi.off();                // no luck, no need for WiFi
