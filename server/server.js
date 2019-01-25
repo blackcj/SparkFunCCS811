@@ -5,25 +5,13 @@ const PORT = process.env.PORT || 5000;
 const axios = require('axios');
 const cron = require('node-cron');
 const db = require('./modules/db.js');
-const mongoose = require('mongoose');
+const Entry = require('./modules/entries.model.js');
+const entriesRouter = require('./routes/entries.router.js');
 
 // Make a request for data every 10 minutes
 cron.schedule('*/10 * * * *', function(){
   getDataFromDevice();
 });
-
-const entrySchema = new mongoose.Schema({
-  temperature: Number,
-  humidity: Number,
-  voc: Number,
-  date: {
-    type: Date,
-    // `Date.now()` returns the current unix timestamp as a number
-    default: Date.now
-  }
-});
-
-const Entry = mongoose.model('Entries', entrySchema);
 
 function getDataFromDevice() {
   console.log('running a task every 10 minutes');
@@ -40,6 +28,8 @@ function getDataFromDevice() {
 
 // Initial reading right away for debugging
 getDataFromDevice();
+
+app.use('/entries', entriesRouter);
 
 // Serve up static files
 app.use(express.static('server/public'));
