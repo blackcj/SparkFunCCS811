@@ -4,7 +4,7 @@ const Entry = require('./../modules/entries.model.js');
 
 router.get('/', (req, res) => {
   console.log('In GET /entries');
-  Entry.find({}).limit(10).exec().then(results => {
+  Entry.find({}).sort({date:-1}).limit(10).exec().then(results => {
       console.log('Found results', results);
       res.send(results);
   }).catch(error => {
