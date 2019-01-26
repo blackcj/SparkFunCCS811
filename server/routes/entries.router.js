@@ -13,4 +13,21 @@ router.get('/', (req, res) => {
   });
 });
 
+router.post('/', (req, res) => {
+  console.log('In POST /entries');
+  console.log(req.body);
+  const reading = JSON.parse(req.body.result);
+  const entry = new Entry({
+    temperature: reading.data2,
+    humidity: reading.data1,
+    device: req.body.coreInfo.deviceID,
+  });
+  entry.save().then(addedEntry => {
+    console.log('Added entry', addedEntry);
+    res.sendStatus(201);
+  }).catch( error => {
+    res.sendStatus(500);
+  });
+});
+
 module.exports = router;
