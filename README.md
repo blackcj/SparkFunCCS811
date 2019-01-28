@@ -16,7 +16,28 @@ The CCS811 is a sensor for monitoring indoor air quality. There are a number of 
 
 Add a [Photon Battery Shield](https://www.sparkfun.com/products/13626) and [lithium battery](https://www.sparkfun.com/products/13851) to make your project portable!
 
-## Wiring
+## Server Setup
+
+### Prerequisites
+
+The following global dependencies are required for this project.
+
+- Node.js
+- Mongo
+- [apiDoc](http://apidocjs.com/#install)
+
+###
+
+1. `npm install`
+1. `npm start`
+
+### Generating Documentation
+
+`apidoc -i server/routes/ -o apidoc/`
+
+## Device Setup
+
+### Wiring
 
 ![wiring](images/wiring.png)
 
@@ -24,13 +45,13 @@ For the complete schematic, open the [air-quality.fzz](https://github.com/blackc
 
 ![project image](images/project-image.jpg)
 
-## Instructions
+### Instructions
 
-### Step 1: Run for 48 hrs
+#### Step 1: Run for 48 hrs
 
 The CCS811 requires a one time 48 hour burn in period. After hooking up your components, run the `burn-in.ino` code for 48 hours. The temperature and humidity readings will be accurate during this time but the tVOC reading will likely jump around.
 
-### Step 2: Switch the drive mode
+#### Step 2: Switch the drive mode
 
 From here on our we'll be using the `air-quality.ino` file. The `burn-in.ino` file is no longer needed.
 
@@ -40,7 +61,7 @@ When switching drive modes, the data sheet recommends setting the mode to **0 (i
 
 > NOTE: The burn in only happens once but the baseline is established every time you reboot your Photon core. Make sure to ignore data collected during this time.
 
-### Step 3: Record some data
+#### Step 3: Record some data
 
 The `air-quality.ino` is set up to display data on the micro OLED and publish the results to a variable `resultstr`. You can make a request to the device at a set interval to record the data.
 

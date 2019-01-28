@@ -1,10 +1,22 @@
 const express = require('express');
 const router = express.Router();
 const Entry = require('./../modules/entries.model.js');
+const Device = require('./../modules/devices.model.js');
 
-router.get('/', (req, res) => {
+/**
+ * @api {get} /entries/:device Request Entries from a specific Device
+ * @apiName GetEntries
+ * @apiGroup Entries
+ *
+ * @apiParam {String} device Device unique _id.
+ *
+ * @apiSuccess (200) {Object[]} entries             List of entries.
+ * @apiSuccess (200) {Number}   entries.humidity    Humidity.
+ * @apiSuccess (200) {String}   entries.temperature Temperature.
+ */
+router.get('/:device', (req, res) => {
   console.log('In GET /entries');
-  Entry.find({}).sort({date:-1}).limit(10).exec().then(results => {
+  Entry.find({device: req.params.device}).sort({date:-1}).limit(10).exec().then(results => {
       console.log('Found results', results);
       res.send(results);
   }).catch(error => {
@@ -13,6 +25,16 @@ router.get('/', (req, res) => {
   });
 });
 
+/**
+ * @api {post} /entries Add a new Entry for a specific Device
+ * @apiName PostEntries
+ * @apiGroup Entries
+ *
+ * @apiParam {Object} result           Object sent by device.
+ * @apiParam {String} result.data1     Humidity.
+ * @apiParam {String} result.data2     Temperature.
+ *
+ */
 router.post('/', (req, res) => {
   console.log('In POST /entries');
   console.log(req.body);
