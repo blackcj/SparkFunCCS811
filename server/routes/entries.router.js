@@ -4,7 +4,8 @@ const Entry = require('./../modules/entries.model.js');
 const Device = require('./../modules/devices.model.js');
 
 /**
- * @api {get} /entries/:device Request Entries from a specific Device
+ * @api {get} /entries/:device Get Entries
+ * @apiDescription Get entries for a specific device.
  * @apiName GetEntries
  * @apiGroup Entries
  *
@@ -17,8 +18,8 @@ const Device = require('./../modules/devices.model.js');
 router.get('/:device', (req, res) => {
   console.log('In GET /entries');
   Entry.find({device: req.params.device}).sort({date:-1}).limit(10).exec().then(results => {
-      console.log('Found results', results);
-      res.send(results);
+    console.log('Found results', results);
+    res.send(results);
   }).catch(error => {
     console.log('Error', error);
     res.sendStatus(500);
@@ -26,7 +27,7 @@ router.get('/:device', (req, res) => {
 });
 
 /**
- * @api {post} /entries Add a new Entry for a specific Device
+ * @api {post} /entries Add Entry
  * @apiName PostEntries
  * @apiGroup Entries
  *
