@@ -16,7 +16,6 @@ const Device = require('./../modules/devices.model.js');
 router.get('/', (req, res) => {
   console.log('In GET /devices');
   Device.find({}).sort({date_added:-1}).limit(10).exec().then(results => {
-    console.log('Found results', results);
     res.send(results);
   }).catch(error => {
     console.log('Error', error);
@@ -26,7 +25,7 @@ router.get('/', (req, res) => {
 
 /**
  * @api {post} /devices Add Device
- * @apiName PostDevices
+ * @apiName PostDevice
  * @apiGroup Devices
  *
  * @apiParam {Object} device              Object containing device properties.
@@ -39,9 +38,31 @@ router.post('/', (req, res) => {
   console.log(req.body);
   const device = new Device(req.body);
   device.save().then(addedDevice => {
-    console.log('Added device', addedDevice);
     res.sendStatus(201);
   }).catch( error => {
+    console.log('Error', error);
+    res.sendStatus(500);
+  });
+});
+
+/**
+ * @api {put} /devices/:id Update Device
+ * @apiName PutDevice
+ * @apiGroup Devices
+ *
+ * @apiParam {Number} id Device unique ID.
+ *
+ * @apiParam {Object} device              Object containing device properties.
+ * @apiParam {String} device.location     Location of the device (e.g. Living Room).
+ * @apiParam {String} devices.device_id   Particle console device id.
+ *
+ */
+router.put('/:id', (req, res) => {
+  console.log('In PUT /devices');
+  Device.findByIdAndUpdate(req.params.id, req.body, {new: true}).exec().then(updatedDevice => {
+    res.send(updatedDevice);
+  }).catch(error => {
+    console.log('Error', error);
     res.sendStatus(500);
   });
 });
