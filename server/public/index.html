@@ -3,9 +3,26 @@
   <head>
     <meta charset="utf-8">
     <title>Data</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   </head>
   <body>
     <h1>Sensor Data</h1>
-    TODO: Add chart here
+    <div id="app">
+      <h2>Add Device</h2>
+      <form id="device-form" @submit.prevent="processForm">
+        <input v-model="deviceLocation">
+        <input v-model="deviceId">
+        <input type="submit" name="Submit" value="Submit">
+      </form>
+      {{ deviceLocation }}
+      {{ deviceId }}
+
+      <h2>Devices</h2>
+      <li v-for="(item, index) in this.devices">
+        Location: {{ item.location }} - Device Id: {{item.device_id}}
+      </li>
+    </div>
   </body>
+  <script src="scripts/client.js"></script>
 </html>
