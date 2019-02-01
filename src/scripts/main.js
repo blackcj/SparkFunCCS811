@@ -1,3 +1,6 @@
+const axios = require('axios');
+const Vue = require('vue');
+
 new Vue({
   el: '#app',
   data: {

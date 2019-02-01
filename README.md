@@ -24,11 +24,13 @@ The following global dependencies are required for this project.
 
 - Node.js
 - Mongo
+- [Browserify](https://www.npmjs.com/package/browserify)
 - [apiDoc](http://apidocjs.com/#install)
 
 ###
 
 1. `npm install`
+1. `npm run build:watch`
 1. `npm start`
 
 ### Generating Documentation
@@ -72,3 +74,4 @@ The `air-quality.ino` is set up to display data on the micro OLED and publish th
 - [Spark Fun Hookup Guide](https://learn.sparkfun.com/tutorials/ccs811-air-quality-breakout-hookup-guide)
 - [Temperature Sensors Comparison](http://www.kandrsmith.org/RJS/Misc/Hygrometers/calib_many.html)
 - [Fritzing Spark Fun Parts](https://github.com/sparkfun/Fritzing_Parts)
+- [npm build tools](https://www.keithcirkel.co.uk/how-to-use-npm-as-a-build-tool/)
