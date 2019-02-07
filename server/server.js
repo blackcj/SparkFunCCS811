@@ -1,17 +1,18 @@
 require('dotenv').config();
+require('./modules/db.js');
+
 const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 5000;
 const bodyParser = require('body-parser');
-const db = require('./modules/db.js');
 const entriesRouter = require('./routes/entries.router.js');
 const devicesRouter = require('./routes/devices.router.js');
-const cronTasks = require('./modules/cron.tasks.js');
+
+// const mockTasks = require('./modules/mock.tasks.js');
+// Start mocking device id 2a0028000251353530373132
+// mockTasks.startMockTask('2a0028000251353530373132');
 
 app.use(bodyParser.json());
-
-// Initial reading right away for debugging
-cronTasks.getDataFromDevice();
 
 app.use('/entries', entriesRouter);
 app.use('/devices', devicesRouter);
