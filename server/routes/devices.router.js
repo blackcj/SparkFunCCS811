@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Entry = require('./../modules/entries.model.js');
 const Device = require('./../modules/devices.model.js');
+const mockTasks = require('./../modules/mock.tasks.js');
 
 /**
  * @api {get} /devices Get Devices
@@ -65,6 +66,22 @@ router.put('/:id', (req, res) => {
     console.log('Error', error);
     res.sendStatus(500);
   });
+});
+
+
+/**
+ * @api {put} /devices/mock/:id Start Mock Data
+ * @apiDescription This route is for development only and will start posting mock data for the provided device id.
+ * @apiName MockDevice
+ * @apiGroup Devices
+ *
+ * @apiParam {Number} id Device unique ID.
+ *
+ */
+router.put('/mock/:id', (req, res) => {
+  console.log('In PUT /devices/mock');
+  mockTasks.startMockTask(req.params.id);
+  res.sendStatus(200);
 });
 
 module.exports = router;
