@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const Entry = require('./../modules/entries.model.js');
 const Device = require('./../modules/devices.model.js');
-const mockTasks = require('./../modules/mock.tasks.js');
+const MockTask = require('./../modules/mock.tasks.js');
+const mockTasks = new MockTask();
 
 /**
  * @api {get} /devices Get Devices
