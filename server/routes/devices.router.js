@@ -5,8 +5,10 @@ const Device = require('./../modules/devices.model.js');
 const MockTask = require('./../modules/mock.tasks.js');
 const mockTasks = new MockTask();
 
-const DeviceTaskManager = require('./modules/device.tasks');
+const DeviceTaskManager = require('./../modules/device.tasks');
 const dtm = new DeviceTaskManager();
+
+dtm.startDeviceTask('abc', 'abc');
 
 /**
  * @api {get} /devices Get Devices

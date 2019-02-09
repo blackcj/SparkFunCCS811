@@ -13,7 +13,7 @@ class DeviceTaskManager {
 
     startDeviceTask(id, intervalInMinutes) {
         if (typeof intervalInMinutes !== 'number') {
-            new TypeError('Interval must be a number');
+            throw new TypeError('Interval must be a number');
         }
         // Ensure there are no decimal places in the interval
         intervalInMinutes = parseInt(intervalInMinutes);
