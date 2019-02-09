@@ -34,11 +34,6 @@ class MockTask {
         this.sendMockData();
     }
 
-    // Helper function used to check if an Object has no properties
-    isEmpty(obj) {
-        return Object.keys(obj).length === 0;
-    }
-
     // Remove a device from list and stop sending mock data for that device
     stopMockTask(deviceId) {
         const foundIndex = this.devices.indexOf(deviceId);
@@ -53,6 +48,7 @@ class MockTask {
     // This function is called every time a new device id is addd to the
     // device array and by the cronTask at the interval set in the constructor
     sendMockData() {
+        // TODO: Make these numbers change over time to better simulate live data
         const result = {
             data2: 70, // temp
             data1: 32  // humidity

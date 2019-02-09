@@ -5,6 +5,9 @@ const Device = require('./../modules/devices.model.js');
 const MockTask = require('./../modules/mock.tasks.js');
 const mockTasks = new MockTask();
 
+const DeviceTaskManager = require('./modules/device.tasks');
+const dtm = new DeviceTaskManager();
+
 /**
  * @api {get} /devices Get Devices
  * @apiDescription This will be updated to only return devices for the logged in user. Right now, we'll assume a single user.
