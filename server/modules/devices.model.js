@@ -27,7 +27,7 @@ if (!encKey) {
 deviceSchema.pre("save", function (next) {
   try {
     this.device_id = CryptoJS.AES.encrypt(this.device_id, encKey).toString(); 
-    this.auth_token = CryptoJS.AES.encrypt(this.device_id, encKey).toString();
+    this.auth_token = CryptoJS.AES.encrypt(this.auth_token, encKey).toString();
     next();
   } catch (err) {
     next(err);

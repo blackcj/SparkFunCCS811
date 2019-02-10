@@ -1,5 +1,7 @@
 const cron = require('node-cron');
 const axios = require('axios');
+const Entry = require('./../modules/entries.model.js');
+const Device = require('./../modules/devices.model.js');
 
 /**
  * DeviceTaskManager manages a list of device ids and will pool each
@@ -41,11 +43,25 @@ class DeviceTaskManager {
 
     requestData(id) {
         console.log(`Requesting data for ${id}`);
-        // Find device in the database by id
-        
-        // Make axios request to the device
-
-        // Store results in the database
+        Device.findOne({ _id: id }).exec().then(foundDevice => {
+            if (foundDevice) {
+                axios.get(`https://api.spark.io/v1/devices/${foundDevice.device_id}/result?access_token=${foundDevice.auth_token}`).then(function (response) {
+                    console.log(response.data);
+                    const reading = JSON.parse(response.data.result);
+                    const entry = new Entry({
+                        temperature: reading.temp,
+                        humidity: reading.humidity,
+                        voc: reading.voc,
+                        device: foundDevice._id,
+                    });
+                    entry.save();
+                }).catch(function (error) {
+                    console.log(error);
+                });
+            }
+        }).catch(error => {
+            console.log('Error', error);
+        });
     }
 }
 

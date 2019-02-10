@@ -51,26 +51,29 @@ router.post('/', (req, res) => {
 });
 
 /**
- * @api {put} /devices/:id Update Device
+ * @api {put} /devices Update Device
  * @apiName PutDevice
  * @apiGroup Devices
- *
- * @apiParam {Number} id Device unique ID.
  *
  * @apiParam {Object} device              Object containing device properties.
  * @apiParam {String} device.location     Location of the device (e.g. Living Room).
  * @apiParam {String} devices.device_id   Particle console device id.
  *
  */
-router.put('/:id', (req, res) => {
-  console.log('In PUT /devices');
-  Device.findByIdAndUpdate(req.params.id, req.body, {new: true}).exec().then(updatedDevice => {
-    if (updatedDevice.polling_enabled) {
-      dtm.startDeviceTask(updatedDevice.device_id);
+router.put('/', (req, res) => {
+  console.log('In PUT /devices', req.body);
+  Device.findByIdAndUpdate(req.body._id, req.body, {new: true}).exec().then(updatedDevice => {
+    if (updatedDevice) {
+      if (updatedDevice.polling_enabled) {
+        dtm.startDeviceTask(updatedDevice._id, 10);
+      } else {
+        dtm.stopDeviceTask(updatedDevice._id);
+      }
+      res.send(updatedDevice);
     } else {
-      dtm.stopDeviceTask(updatedDevice.device_id);
+      console.log('Device not found.')
     }
-    res.send(updatedDevice);
+
   }).catch(error => {
     console.log('Error', error);
     res.sendStatus(500);

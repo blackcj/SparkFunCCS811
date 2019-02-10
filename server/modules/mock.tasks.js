@@ -50,8 +50,9 @@ class MockTask {
     sendMockData() {
         // TODO: Make these numbers change over time to better simulate live data
         const result = {
-            data2: 70, // temp
-            data1: 32  // humidity
+            temp: 70, // temp
+            humidity: 32,  // humidity
+            voc: 10
         };
         for (const deviceId of this.devices) {
             instance({

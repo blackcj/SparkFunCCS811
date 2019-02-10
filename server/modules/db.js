@@ -1,5 +1,6 @@
 // getting-started.js
 const mongoose = require('mongoose');
+mongoose.set('useFindAndModify', false)
 mongoose.connect('mongodb://localhost/air_quality', { useNewUrlParser: true });
 
 const db = mongoose.connection;

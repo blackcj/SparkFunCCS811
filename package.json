@@ -27,7 +27,7 @@
     "crypto-js": "^3.1.9-1",
     "dotenv": "^5.0.1",
     "express": "^4.16.3",
-    "mongoose": "^5.4.6",
+    "mongoose": "^5.4.11",
     "node-cron": "^2.0.3",
     "vue": "^2.5.22"
   },
