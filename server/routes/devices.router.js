@@ -8,8 +8,6 @@ const mockTasks = new MockTask();
 const DeviceTaskManager = require('./../modules/device.tasks');
 const dtm = new DeviceTaskManager();
 
-dtm.startDeviceTask('abc', 'abc');
-
 /**
  * @api {get} /devices Get Devices
  * @apiDescription This will be updated to only return devices for the logged in user. Right now, we'll assume a single user.
@@ -67,6 +65,11 @@ router.post('/', (req, res) => {
 router.put('/:id', (req, res) => {
   console.log('In PUT /devices');
   Device.findByIdAndUpdate(req.params.id, req.body, {new: true}).exec().then(updatedDevice => {
+    if (updatedDevice.polling_enabled) {
+      dtm.startDeviceTask(updatedDevice.device_id);
+    } else {
+      dtm.stopDeviceTask(updatedDevice.device_id);
+    }
     res.send(updatedDevice);
   }).catch(error => {
     console.log('Error', error);

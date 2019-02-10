@@ -27,7 +27,15 @@ The following global dependencies are required for this project.
 - [Browserify](https://www.npmjs.com/package/browserify)
 - [apiDoc](http://apidocjs.com/#install)
 
-###
+### Enviornment Variables
+
+Create a `.env` file in the project root directory. Add the following environment variables replacing the value to the right of the equals sign.
+
+```
+ENCRYPTION_KEY=replace_me
+```
+
+### Start the Server
 
 1. `npm install`
 1. `npm run build:watch`
@@ -37,7 +45,7 @@ The following global dependencies are required for this project.
 
 `apidoc -i server/routes/ -o apidoc/`
 
-## Device Setup
+## Hardware Device Setup
 
 ### Wiring
 
