@@ -43,7 +43,7 @@ class DeviceTaskManager {
 
     requestData(id) {
         console.log(`Requesting data for ${id}`);
-        Device.findOne({ _id: id }).exec().then(foundDevice => {
+        Device.findOne({ _id: id }, '+auth_token').exec().then(foundDevice => {
             if (foundDevice) {
                 axios.get(`https://api.spark.io/v1/devices/${foundDevice.device_id}/result?access_token=${foundDevice.auth_token}`).then(function (response) {
                     console.log(response.data);

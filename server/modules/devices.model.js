@@ -4,7 +4,11 @@ const CryptoJS = require('crypto-js');
 const deviceSchema = new mongoose.Schema({
   device_id: String,
   location: String,
-  auth_token: String,
+  // By default, don't return the auth token
+  auth_token: {
+    type: String,
+    select: false
+  },
   polling_enabled: {
     type: Boolean,
     default: false
@@ -37,7 +41,9 @@ deviceSchema.pre("save", function (next) {
 // Decrypt the device id and token on the way out
 deviceSchema.post('init', function (doc) {
   doc.device_id = CryptoJS.AES.decrypt(doc.device_id, encKey).toString(CryptoJS.enc.Utf8);
-  doc.auth_token = CryptoJS.AES.decrypt(doc.auth_token, encKey).toString(CryptoJS.enc.Utf8);
+  if (doc.auth_token) {
+    doc.auth_token = CryptoJS.AES.decrypt(doc.auth_token, encKey).toString(CryptoJS.enc.Utf8);
+  }
 });
 
 const Device = mongoose.model('Devices', deviceSchema);
