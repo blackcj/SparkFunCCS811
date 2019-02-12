@@ -14,6 +14,7 @@ class DeviceTaskManager {
     }
 
     startDeviceTask(id, intervalInMinutes) {
+        console.log('Enabling polling for ', id);
         if (typeof intervalInMinutes !== 'number') {
             throw new TypeError('Interval must be a number');
         }
@@ -22,7 +23,7 @@ class DeviceTaskManager {
 
         // Only add the device if it doesn't already exist in the object
         if (!this.devices[id]) {
-            this.devices[id] = cron.schedule(`*/${intervalInMinutes} * * * *`, () => {
+            this.devices[id] = cron.schedule(`*/${intervalInMinutes} * * * * *`, () => {
                 const deviceId = id;
                 this.requestData(deviceId);
             },);
@@ -45,6 +46,7 @@ class DeviceTaskManager {
         console.log(`Requesting data for ${id}`);
         Device.findOne({ _id: id }, '+auth_token').exec().then(foundDevice => {
             if (foundDevice) {
+                // TODO: In some error cases, it may be better to back off on request frequency
                 axios.get(`https://api.spark.io/v1/devices/${foundDevice.device_id}/result?access_token=${foundDevice.auth_token}`).then(function (response) {
                     console.log(response.data);
                     const reading = JSON.parse(response.data.result);
@@ -55,8 +57,8 @@ class DeviceTaskManager {
                         device: foundDevice._id,
                     });
                     entry.save();
-                }).catch(function (error) {
-                    console.log(error);
+                }).catch( error => {
+                    console.log('Error', error.response.status, error.response.statusText);
                 });
             }
         }).catch(error => {

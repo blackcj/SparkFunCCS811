@@ -127,6 +127,10 @@ void loop() {
             oled.display();         // Draw on the screen
         }
     } else {
+        if(Particle.connected()) {
+            sprintf(resultstr, "{\"humidity\":%4.2f,\"temp\":%4.2f,\"voc\":%i,\"co2\":%i}", h, f, -1, -1);
+            Particle.publish("reading", resultstr);
+        }
         printIdleValuesToOLED(f, h);
     }
     delay(65000); // Delay at least 60 seconds or adjust drive mode accordingly

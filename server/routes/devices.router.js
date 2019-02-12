@@ -1,12 +1,21 @@
 const express = require('express');
 const router = express.Router();
-const Entry = require('./../modules/entries.model.js');
 const Device = require('./../modules/devices.model.js');
+
+// Mock tasks are used for development to simulate an actual device
 const MockTask = require('./../modules/mock.tasks.js');
 const mockTasks = new MockTask();
 
+// The device manager polls devices with polling enabled
 const DeviceTaskManager = require('./../modules/device.tasks');
 const dtm = new DeviceTaskManager();
+
+// Loop through all devices and start tasks for those that have polling enabled
+Device.find({ polling_enabled: true }).exec().then(results => {
+  for (const foundDevice of results) {
+    dtm.startDeviceTask(foundDevice._id, 30);
+  }
+});
 
 /**
  * @api {get} /devices Get Devices
@@ -65,13 +74,15 @@ router.put('/', (req, res) => {
   Device.findByIdAndUpdate(req.body._id, req.body, {new: true}).exec().then(updatedDevice => {
     if (updatedDevice) {
       if (updatedDevice.polling_enabled) {
-        dtm.startDeviceTask(updatedDevice._id, 10);
+        // TODO: Set polling interval as a device property
+        dtm.startDeviceTask(updatedDevice._id, 30);
       } else {
         dtm.stopDeviceTask(updatedDevice._id);
       }
       res.send(updatedDevice);
     } else {
-      console.log('Device not found.')
+      console.log('Device not found.');
+      res.sendStatus(500);
     }
 
   }).catch(error => {
