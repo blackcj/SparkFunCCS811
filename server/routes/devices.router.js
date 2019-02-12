@@ -10,10 +10,12 @@ const mockTasks = new MockTask();
 const DeviceTaskManager = require('./../modules/device.tasks');
 const dtm = new DeviceTaskManager();
 
+const POLLING_FREQUENCY = 2;
+
 // Loop through all devices and start tasks for those that have polling enabled
 Device.find({ polling_enabled: true }).exec().then(results => {
   for (const foundDevice of results) {
-    dtm.startDeviceTask(foundDevice._id, 30);
+    dtm.startDeviceTask(foundDevice._id, POLLING_FREQUENCY);
   }
 });
 
@@ -75,7 +77,7 @@ router.put('/', (req, res) => {
     if (updatedDevice) {
       if (updatedDevice.polling_enabled) {
         // TODO: Set polling interval as a device property
-        dtm.startDeviceTask(updatedDevice._id, 30);
+        dtm.startDeviceTask(updatedDevice._id, POLLING_FREQUENCY);
       } else {
         dtm.stopDeviceTask(updatedDevice._id);
       }

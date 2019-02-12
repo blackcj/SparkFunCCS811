@@ -23,7 +23,7 @@ class DeviceTaskManager {
 
         // Only add the device if it doesn't already exist in the object
         if (!this.devices[id]) {
-            this.devices[id] = cron.schedule(`*/${intervalInMinutes} * * * * *`, () => {
+            this.devices[id] = cron.schedule(`*/${intervalInMinutes} * * * *`, () => {
                 const deviceId = id;
                 this.requestData(deviceId);
             },);
