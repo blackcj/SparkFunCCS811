@@ -3,15 +3,19 @@
   <head>
     <meta charset="utf-8">
     <title>Data</title>
-
+    <link rel="stylesheet" href="styles.css">
   </head>
   <body>
     <h1>Sensor Data</h1>
     <div id="app">
       <h2>Add Device</h2>
       <form id="device-form" @submit.prevent="processForm">
-        <input v-model="deviceLocation">
-        <input v-model="deviceId">
+        <label for="location">Location</label>
+        <input type="text" id="location" v-model="deviceLocation" placeholder="e.g. Basement">
+        <label for="device-id">Device ID:</label>
+        <input type="text" id="device-id" v-model="deviceId">
+        <label for="auth-token">Auth Token:</label>
+        <input type="text" id="auth-token" v-model="authToken">
         <input type="submit" name="Submit" value="Submit">
       </form>
       {{ deviceLocation }}

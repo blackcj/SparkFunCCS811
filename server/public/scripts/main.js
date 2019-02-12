@@ -12540,6 +12540,7 @@ new Vue({
   data: {
     deviceId: '',
     deviceLocation: '',
+    authToken: '',
     devices: [],
   },
   mounted () {
@@ -12551,10 +12552,11 @@ new Vue({
       axios({
         method: 'POST',
         url: '/devices',
-        data: { device_id: this.deviceId, location: this.deviceLocation }
+        data: { device_id: this.deviceId, location: this.deviceLocation, auth_token: this.authToken }
       }).then(response => {
         this.deviceId = '';
         this.deviceLocation = '';
+        this.authToken = '';
         this.getDevices();
       }).catch(error => {
         console.log(error);
