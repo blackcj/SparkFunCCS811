@@ -12542,6 +12542,7 @@ new Vue({
     deviceLocation: '',
     authToken: '',
     devices: [],
+    entries: [],
   },
   mounted () {
     this.getDevices();
@@ -12568,6 +12569,17 @@ new Vue({
         url: '/devices',
       }).then(response => {
         this.devices = response.data;
+      }).catch(error => {
+        console.log(error);
+      })
+    },
+    getEntries: function (deviceId) {
+      console.log('Device clicked',deviceId);
+      axios({
+        method: 'GET',
+        url: `/entries/${deviceId}`,
+      }).then(response => {
+        this.entries = response.data;
       }).catch(error => {
         console.log(error);
       })

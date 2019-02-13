@@ -17,7 +17,7 @@ const Device = require('./../modules/devices.model.js');
  */
 router.get('/:device', (req, res) => {
   console.log('In GET /entries');
-  Entry.find({device: req.params.device}).sort({date:-1}).limit(10).exec().then(results => {
+  Entry.find({device: req.params.device}).sort({date:-1}).limit(20).exec().then(results => {
     console.log('Found results', results);
     res.send(results);
   }).catch(error => {

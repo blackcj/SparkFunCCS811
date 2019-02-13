@@ -22,9 +22,18 @@
       {{ deviceId }}
 
       <h2>Devices</h2>
-      <li v-for="(item, index) in this.devices">
-        Location: {{ item.location }} - Device Id: {{item.device_id}}
-      </li>
+      <ul>
+        <li v-for="(item, index) in this.devices">
+          Location: {{ item.location }} - Device Id: {{ item.device_id }} <button @click="getEntries(item._id)">Show Entries</button>
+        </li>
+      </ul>
+      <h2>Entries</h2>
+      <ul>
+        <li v-for="(entry, index) in this.entries">
+          {{ entry.date }}: temperature: {{ entry.temperature }} - humidity: {{entry.humidity}} - voc: {{entry.voc}}
+        </li>
+      </ul>
+      
     </div>
   </body>
   <script src="scripts/main.js"></script>
