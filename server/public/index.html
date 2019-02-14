@@ -18,15 +18,21 @@
         <input type="text" id="auth-token" v-model="authToken">
         <input type="submit" name="Submit" value="Submit">
       </form>
-      {{ deviceLocation }}
-      {{ deviceId }}
 
       <h2>Devices</h2>
-      <ul>
-        <li v-for="(item, index) in this.devices">
-          Location: {{ item.location }} - Device Id: {{ item.device_id }} <button @click="getEntries(item._id)">Show Entries</button>
-        </li>
-      </ul>
+      <table id="devices-table">
+        <thead>
+          <tr><th>Location</th><th>Device Id</th><th>Polling Enabled</th><th>View Entries</th></tr>
+        </thead>
+        <tbody>
+          <tr v-for="(item, index) in this.devices">
+            <td>{{ item.location }}</td>
+            <td>{{ item.device_id }}</td>
+            <td>{{ item.polling_enabled }}</td>
+            <td><button @click="getEntries(item._id)">Show Entries</button></td>
+          </tr>
+        </tbody>
+      </table>
       <h2>Entries</h2>
       <ul>
         <li v-for="(entry, index) in this.entries">

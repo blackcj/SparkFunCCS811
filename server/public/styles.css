@@ -25,3 +25,14 @@
   border-radius: 4px;
   cursor: pointer;
 }
+
+#device-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+#device-table th, td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
