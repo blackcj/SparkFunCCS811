@@ -39,6 +39,20 @@ new Vue({
         console.log(error);
       })
     },
+    togglePolling: function (device) {
+      axios({
+        method: 'PUT',
+        url: '/devices',
+        data: {
+          _id: device._id,
+          polling_enabled: !device.polling_enabled 
+        }
+      }).then(response => {
+        this.getDevices();
+      }).catch(error => {
+        console.log(error);
+      })
+    },
     getEntries: function (deviceId) {
       console.log('Device clicked',deviceId);
       axios({
