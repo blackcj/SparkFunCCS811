@@ -3,59 +3,72 @@
 
 <head>
   <meta charset="utf-8">
-  <title>Data</title>
+  <title>Sensor Data</title>
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
-  <h1>Sensor Data</h1>
-  <div id="app">
-    <div class="column">
-      <h2>Add Device</h2>
-      <form id="device-form" @submit.prevent="processForm">
-        <label for="location">Location</label>
-        <input type="text" id="location" v-model="deviceLocation" placeholder="e.g. Basement">
-        <label for="device-id">Device ID:</label>
-        <input type="text" id="device-id" v-model="deviceId">
-        <label for="auth-token">Auth Token:</label>
-        <input type="text" id="auth-token" v-model="authToken">
-        <input type="submit" name="Submit" value="Submit">
-      </form>
+  <header>
+    <h1>Sensor Data</h1>
+  </header>
+  <div class="container">
+    <div id="app">
+      <div class="col-6 col-s-12">
+        <div class="content">
+          <h2>Add Device</h2>
+          <hr />
+          <form id="device-form" @submit.prevent="processForm">
+            <label for="location">Location</label>
+            <input type="text" id="location" v-model="deviceLocation" placeholder="e.g. Basement">
+            <label for="device-id">Device ID:</label>
+            <input type="text" id="device-id" v-model="deviceId">
+            <label for="auth-token">Auth Token:</label>
+            <input type="text" id="auth-token" v-model="authToken">
+            <input type="submit" name="Submit" value="Submit">
+          </form>
 
-      <h2>Devices</h2>
-      <table id="devices-table">
-        <thead>
-          <tr>
-            <th>Location</th>
-            <th>Device Id</th>
-            <th>Polling Enabled</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(item, index) in this.devices">
-            <td>{{ item.location }}</td>
-            <td>{{ item.device_id }}</td>
-            <td>{{ item.polling_enabled }}</td>
-            <td>
-              <button @click="togglePolling(item)">
-                <span v-if="item.polling_enabled">Turn Off</span>
-                <span v-else>Turn On</span>
-              </button>
-              <button @click="getEntries(item._id)">Show Entries</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="column">
-      <h2>Entries</h2>
-      <span v-if="this.entries.length === 0">No Entries</span>
-      <ul>
-        <li v-for="(entry, index) in this.entries">
-          {{ entry.date }}: temperature: {{ entry.temperature }} - humidity: {{entry.humidity}} - voc: {{entry.voc}}
-        </li>
-      </ul>
+          <h2>Devices</h2>
+          <hr />
+          <table id="devices-table">
+            <thead>
+              <tr>
+                <th>Location</th>
+                <th>Device Id</th>
+                <th>Polling Enabled</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, index) in this.devices">
+                <td>{{ item.location }}</td>
+                <td>{{ item.device_id }}</td>
+                <td>{{ item.polling_enabled }}</td>
+                <td>
+                  <button @click="togglePolling(item)">
+                    <span v-if="item.polling_enabled">Turn Off</span>
+                    <span v-else>Turn On</span>
+                  </button>
+                  <button @click="getEntries(item._id)">Show Entries</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="col-6 col-s-12">
+        <div class="content">
+          <h2>Entries</h2>
+          <hr />
+          <span v-if="this.entries.length === 0">No Entries</span>
+          <ul>
+            <li v-for="(entry, index) in this.entries">
+              {{ entry.date }}: temperature: {{ entry.temperature }} - humidity: {{entry.humidity}} - voc: {{entry.voc}}
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
   </div>
 </body>
