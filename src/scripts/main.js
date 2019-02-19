@@ -9,6 +9,7 @@ new Vue({
     authToken: '',
     devices: [],
     entries: [],
+    showDeviceModal: false,
   },
   mounted () {
     this.getDevices();
@@ -24,10 +25,17 @@ new Vue({
         this.deviceId = '';
         this.deviceLocation = '';
         this.authToken = '';
+        this.showDeviceModal = !this.showDeviceModal;
         this.getDevices();
       }).catch(error => {
         console.log(error);
       })
+    },
+    onCancel: function () {
+      this.showDeviceModal = !this.showDeviceModal;
+    },
+    onAddDevice: function () {
+      this.showDeviceModal = !this.showDeviceModal;
     },
     getDevices: function() {
       axios({
