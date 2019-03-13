@@ -28,6 +28,7 @@ int xOffset = 0;
 
 bool sensorReady = false; // This will be set to true after the 10 minute idle period
 bool warmUp = true; // This will be set to false after the 30 minute warm up
+bool useOLED = false;
 uint32_t startTime; // Time we booted up the device
 
 void setup() {
@@ -45,15 +46,9 @@ void setup() {
     }
 
     // Set boot time to now
-	  startTime = millis();
+	startTime = millis();
 
-    oled.begin();       // Initialize the OLED
-    oled.clear(ALL);    // Clear the display's internal memory
-    oled.display();     // Display what's in the buffer (splashscreen)
-    delay(500);         // Delay 500 ms
-    oled.clear(PAGE);   // Clear the buffer.
-
-
+    initOLED();
 
     // Start the Si7021 temperature sensor
     sensor.begin();
@@ -111,24 +106,20 @@ void loop() {
             printValuesToOLED(f, h, voc);
 
             if(Particle.connected()) {
-                sprintf(resultstr, "{\"humidity\":%4.2f,\"temp\":%4.2f,\"voc\":%i,\"co2\":%i}", h, f, voc, co2);
+                sprintf(resultstr, "{\"humidity\":%4.2f,\"temp\":%4.2f,\"voc\":%i,\"co2\":%i,\"warmUp\":%d}", h, f, voc, co2, warmUp);
                 Particle.publish("reading", resultstr);
             }
         }else if (myCCS811.checkForStatusError()){
             if(Particle.connected()) {
                 Particle.publish("log","Failed to read CCS811 sensor!");
             }
-            clearOLED();
-            oled.print("Error");
-            oled.display();         // Draw on the screen
+            printOLED("Error");
         } else {
-            clearOLED();
-            oled.print("No Data");
-            oled.display();         // Draw on the screen
+            printOLED("No Data");
         }
     } else {
         if(Particle.connected()) {
-            sprintf(resultstr, "{\"humidity\":%4.2f,\"temp\":%4.2f,\"voc\":%i,\"co2\":%i}", h, f, -1, -1);
+            sprintf(resultstr, "{\"humidity\":%4.2f,\"temp\":%4.2f,\"voc\":%i,\"co2\":%i,\"warmUp\":%d}", h, f, -1, -1, warmUp);
             Particle.publish("reading", resultstr);
         }
         printIdleValuesToOLED(f, h);
@@ -138,120 +129,151 @@ void loop() {
 
 // Print status returned from CCS811
 void printStatus() {
-    clearOLED();
+    
     switch ( returnCode )
     {
         case CCS811Core::SENSOR_SUCCESS:
-            oled.print("SUCCESS");
+            printOLED("SUCCESS");
             Particle.publish("status", "SUCCESS");
             break;
         case CCS811Core::SENSOR_ID_ERROR:
-            oled.print("ID_ERROR");
+            printOLED("ID_ERROR");
             Particle.publish("status", "ID_ERROR");
             break;
         case CCS811Core::SENSOR_I2C_ERROR:
-            oled.print("I2C_ERROR");
+            printOLED("I2C_ERROR");
             Particle.publish("status", "I2C_ERROR");
             break;
         case CCS811Core::SENSOR_INTERNAL_ERROR:
-            oled.print("INTERNAL_ERROR");
+            printOLED("INTERNAL_ERROR");
             Particle.publish("status", "INTERNAL_ERROR");
             break;
         case CCS811Core::SENSOR_GENERIC_ERROR:
-            oled.print("GENERIC_ERROR");
+            printOLED("GENERIC_ERROR");
             Particle.publish("status", "GENERIC_ERROR");
             break;
         default:
-            oled.print("Unspecified error.");
+            printOLED("Unspecified error.");
             Particle.publish("status", "Unspecified error.");
     }
-    oled.display();     // Draw on the screen
-    delay(5000);       // Wait 5 seconds so we can read the status
-}
-
-void clearOLED()
-{
-    // Move the offset to help prevent OLED burn in
-    yOffset += 1;
-    if(yOffset > 8) {
-        yOffset = 0;
-        xOffset += 1;
-    }
-    if(xOffset > 8) {
-        xOffset = 0;
-    }
-    oled.clear(PAGE);       // Clear the buffer.
-    oled.setCursor(0 + xOffset, 0 + yOffset);   // Set cursor to top-left
-    oled.setFontType(0);    // Use the smallest font
 }
 
 // Print errors returned from CCS811
 void printSensorError()
 {
-    clearOLED();
     uint8_t error = myCCS811.getErrorRegister();
 
     if ( error == 0xFF ) //comm error
     {
-        oled.print("Failed to get ERROR_ID register.");
+        printOLED("Failed to get ERROR_ID register.");
         Particle.publish("error", "Failed to get ERROR_ID register.");
     }
     else
     {
         if (error & 1 << 5) {
-            oled.print("HeaterSupply");
+            printOLED("HeaterSupply");
             Particle.publish("error", "HeaterSupply");
         }
         if (error & 1 << 4) {
-            oled.print("HeaterFault");
+            printOLED("HeaterFault");
             Particle.publish("error", "HeaterFault");
         }
         if (error & 1 << 3) {
-            oled.print("MaxResistance");
+            printOLED("MaxResistance");
             Particle.publish("error", "MaxResistance");
         }
         if (error & 1 << 2) {
-            oled.print("MeasModeInvalid");
+            printOLED("MeasModeInvalid");
             Particle.publish("error", "MeasModeInvalid");
         }
         if (error & 1 << 1) {
-            oled.print("ReadRegInvalid");
+            printOLED("ReadRegInvalid");
             Particle.publish("error", "ReadRegInvalid");
         }
         if (error & 1 << 0) {
-            oled.print("MsgInvalid");
+            printOLED("MsgInvalid");
             Particle.publish("error", "MsgInvalid");
         }
     }
-    oled.display();     // Draw on the screen
-    delay(5000);        // Wait 5 seconds so we can read the error
+}
+
+// OLED functins
+
+void initOLED()
+{
+    if (useOLED)
+    {
+        oled.begin();     // Initialize the OLED
+        oled.clear(ALL);  // Clear the display's internal memory
+        oled.display();   // Display what's in the buffer (splashscreen)
+        delay(500);       // Delay 500 ms
+        oled.clear(PAGE); // Clear the buffer.
+    }
+}
+
+void printOLED(String message)
+{
+    if (useOLED)
+    {
+        clearOLED();
+        oled.print(message);
+        oled.display(); // Draw on the screen
+        delay(5000);    // Wait 5 seconds so we can read the status
+    }
+}
+
+void clearOLED()
+{
+    if (useOLED)
+    {
+        // Move the offset to help prevent OLED burn in
+        yOffset += 1;
+        if (yOffset > 8)
+        {
+            yOffset = 0;
+            xOffset += 1;
+        }
+        if (xOffset > 8)
+        {
+            xOffset = 0;
+        }
+        oled.clear(PAGE);                         // Clear the buffer.
+        oled.setCursor(0 + xOffset, 0 + yOffset); // Set cursor to top-left
+        oled.setFontType(0);                      // Use the smallest font
+    }
 }
 
 // Print values to OLED display
 void printIdleValuesToOLED(double f, double h) {
-    clearOLED();
-    oled.print("idle: ");
-    int idleRemaining = (600000 - millis() - startTime) / 60000 + 1;
-    oled.print(idleRemaining);
-    oled.setCursor(0 + xOffset, 16 + yOffset);  // Set cursor to middle-left
-    oled.print("t: ");
-    oled.print(f);          // Print temperature value
-    oled.setCursor(0 + xOffset, 32 + yOffset);  // Set cursor bottom-left
-    oled.print("h: ");
-    oled.print(h);          // Print humidity value
-    oled.display();         // Draw on the screen
+    if (useOLED)
+    {
+        clearOLED();
+        oled.print("idle: ");
+        int idleRemaining = (600000 - millis() - startTime) / 60000 + 1;
+        oled.print(idleRemaining);
+        oled.setCursor(0 + xOffset, 16 + yOffset); // Set cursor to middle-left
+        oled.print("t: ");
+        oled.print(f);                             // Print temperature value
+        oled.setCursor(0 + xOffset, 32 + yOffset); // Set cursor bottom-left
+        oled.print("h: ");
+        oled.print(h);  // Print humidity value
+        oled.display(); // Draw on the screen
+    }
 }
 
 // Print values to OLED display
 void printValuesToOLED(double f, double h, int voc) {
-    clearOLED();
-    oled.print("voc: ");
-    oled.print(voc);        // Print co2 value
-    oled.setCursor(0 + xOffset, 16 + yOffset);  // Set cursor to middle-left
-    oled.print("t: ");
-    oled.print(f);          // Print temperature value
-    oled.setCursor(0 + xOffset, 32 + yOffset);  // Set cursor bottom-left
-    oled.print("h: ");
-    oled.print(h);          // Print humidity value
-    oled.display();         // Draw on the screen
+    if (useOLED)
+    {
+        clearOLED();
+        oled.print("voc: ");
+        oled.print(voc);                           // Print co2 value
+        oled.setCursor(0 + xOffset, 16 + yOffset); // Set cursor to middle-left
+        oled.print("t: ");
+        oled.print(f);                             // Print temperature value
+        oled.setCursor(0 + xOffset, 32 + yOffset); // Set cursor bottom-left
+        oled.print("h: ");
+        oled.print(h);  // Print humidity value
+        oled.display(); // Draw on the screen
+    }
 }
