@@ -20,33 +20,36 @@ CCS811 myCCS811(CCS811_ADDR);
 Adafruit_Si7021 sensor = Adafruit_Si7021();
 MicroOLED oled;
 CCS811Core::status returnCode;
-const uint32_t msRetryTime  =   30000; // stop trying after 30sec
+const uint32_t msRetryTime = 30000; // stop trying after 30sec
 
 char resultstr[128]; // This is where we will put the data
 int yOffset = 0;
 int xOffset = 0;
 
 bool sensorReady = false; // This will be set to true after the 10 minute idle period
-bool warmUp = true; // This will be set to false after the 30 minute warm up
+bool warmUp = true;       // This will be set to false after the 30 minute warm up
 bool useOLED = false;
 uint32_t startTime; // Time we booted up the device
 
-void setup() {
+void setup()
+{
     // SEMI-AUTOMATIC mode allows us to read oled even without a cloud connection.
     // This is good for measurements on the go (no WiFi).
     Particle.connect();
-    if (!waitFor(Particle.connected, msRetryTime)) { // Wait for 30 seconds
-        WiFi.off();                // no luck, no need for WiFi
+    if (!waitFor(Particle.connected, msRetryTime))
+    {               // Wait for 30 seconds
+        WiFi.off(); // no luck, no need for WiFi
         RGB.control(true);
-        RGB.color(0, 0, 0);        // turn off blinking green light if no WiFi
+        RGB.color(0, 0, 0); // turn off blinking green light if no WiFi
     }
-    if(Particle.connected()) {
+    if (Particle.connected())
+    {
         Particle.publish("log", "Air Quality Start");
         Particle.variable("result", resultstr, STRING);
     }
 
     // Set boot time to now
-	startTime = millis();
+    startTime = millis();
 
     initOLED();
 
@@ -59,21 +62,25 @@ void setup() {
     delay(1000);
     // Documentation recommends setting the mode to idle for 10 minutes
     // before switching to mode 2 or 3.
-    if(Particle.connected()) {
+    if (Particle.connected())
+    {
         Particle.publish("state", "Setting sensor mode to 0");
     }
     returnCode = myCCS811.setDriveMode(0);
     printStatus();
 }
 
-void loop() {
+void loop()
+{
     double t = sensor.readTemperature();
     double h = sensor.readHumidity();
     double f = t * 1.8 + 32;
 
     // Give the sensor 10 minutes in idle (mode 0) before setting to 10 second interval (mode 2)
-    if (!sensorReady && millis() - startTime >= 600000){
-        if(Particle.connected()) {
+    if (!sensorReady && millis() - startTime >= 600000)
+    {
+        if (Particle.connected())
+        {
             Particle.publish("state", "Setting sensor mode to 3");
         }
         // Modes: 0 idle, 1 every second, 2 every 10 seconds, 3 every 60 seconds
@@ -84,43 +91,58 @@ void loop() {
     }
 
     // Wait for device to warm up. Documentation says 20 minutes but it seems like 30 - 40 is more accurate.
-    if (millis() - startTime >= 2400000){
-        if(warmUp && Particle.connected()) {
+    if (millis() - startTime >= 2400000)
+    {
+        if (warmUp && Particle.connected())
+        {
             Particle.publish("state", "Warm up complete");
         }
         warmUp = false;
     }
 
-    if(t > 0 && h > 0) {
+    if (t > 0 && h > 0)
+    {
         myCCS811.setEnvironmentalData(h, t);
     }
 
-    if(sensorReady) {
+    if (sensorReady)
+    {
         // Data will only be available if we wait at least the number of seconds dictated by the drive mode
         if (myCCS811.dataAvailable())
         {
             myCCS811.readAlgorithmResults();
             delay(750);
-            int co2 = myCCS811.getCO2();    // CO2 equivalent value (NOT actual CO2)
+            int co2 = myCCS811.getCO2(); // CO2 equivalent value (NOT actual CO2)
             int voc = myCCS811.getTVOC();
             printValuesToOLED(f, h, voc);
 
-            if(Particle.connected()) {
+            if (Particle.connected())
+            {
                 sprintf(resultstr, "{\"humidity\":%4.2f,\"temp\":%4.2f,\"voc\":%i,\"co2\":%i,\"warmUp\":%d}", h, f, voc, co2, warmUp);
                 Particle.publish("reading", resultstr);
+                Particle.publish("capacitor", resultstr, PRIVATE);
             }
-        }else if (myCCS811.checkForStatusError()){
-            if(Particle.connected()) {
-                Particle.publish("log","Failed to read CCS811 sensor!");
+        }
+        else if (myCCS811.checkForStatusError())
+        {
+            if (Particle.connected())
+            {
+                Particle.publish("log", "Failed to read CCS811 sensor!");
             }
             printOLED("Error");
-        } else {
+        }
+        else
+        {
             printOLED("No Data");
         }
-    } else {
-        if(Particle.connected()) {
+    }
+    else
+    {
+        if (Particle.connected())
+        {
             sprintf(resultstr, "{\"humidity\":%4.2f,\"temp\":%4.2f,\"voc\":%i,\"co2\":%i,\"warmUp\":%d}", h, f, -1, -1, warmUp);
             Particle.publish("reading", resultstr);
+            Particle.publish("capacitor", resultstr, PRIVATE);
         }
         printIdleValuesToOLED(f, h);
     }
@@ -128,33 +150,34 @@ void loop() {
 }
 
 // Print status returned from CCS811
-void printStatus() {
-    
-    switch ( returnCode )
+void printStatus()
+{
+
+    switch (returnCode)
     {
-        case CCS811Core::SENSOR_SUCCESS:
-            printOLED("SUCCESS");
-            Particle.publish("status", "SUCCESS");
-            break;
-        case CCS811Core::SENSOR_ID_ERROR:
-            printOLED("ID_ERROR");
-            Particle.publish("status", "ID_ERROR");
-            break;
-        case CCS811Core::SENSOR_I2C_ERROR:
-            printOLED("I2C_ERROR");
-            Particle.publish("status", "I2C_ERROR");
-            break;
-        case CCS811Core::SENSOR_INTERNAL_ERROR:
-            printOLED("INTERNAL_ERROR");
-            Particle.publish("status", "INTERNAL_ERROR");
-            break;
-        case CCS811Core::SENSOR_GENERIC_ERROR:
-            printOLED("GENERIC_ERROR");
-            Particle.publish("status", "GENERIC_ERROR");
-            break;
-        default:
-            printOLED("Unspecified error.");
-            Particle.publish("status", "Unspecified error.");
+    case CCS811Core::SENSOR_SUCCESS:
+        printOLED("SUCCESS");
+        Particle.publish("status", "SUCCESS");
+        break;
+    case CCS811Core::SENSOR_ID_ERROR:
+        printOLED("ID_ERROR");
+        Particle.publish("status", "ID_ERROR");
+        break;
+    case CCS811Core::SENSOR_I2C_ERROR:
+        printOLED("I2C_ERROR");
+        Particle.publish("status", "I2C_ERROR");
+        break;
+    case CCS811Core::SENSOR_INTERNAL_ERROR:
+        printOLED("INTERNAL_ERROR");
+        Particle.publish("status", "INTERNAL_ERROR");
+        break;
+    case CCS811Core::SENSOR_GENERIC_ERROR:
+        printOLED("GENERIC_ERROR");
+        Particle.publish("status", "GENERIC_ERROR");
+        break;
+    default:
+        printOLED("Unspecified error.");
+        Particle.publish("status", "Unspecified error.");
     }
 }
 
@@ -163,34 +186,40 @@ void printSensorError()
 {
     uint8_t error = myCCS811.getErrorRegister();
 
-    if ( error == 0xFF ) //comm error
+    if (error == 0xFF) //comm error
     {
         printOLED("Failed to get ERROR_ID register.");
         Particle.publish("error", "Failed to get ERROR_ID register.");
     }
     else
     {
-        if (error & 1 << 5) {
+        if (error & 1 << 5)
+        {
             printOLED("HeaterSupply");
             Particle.publish("error", "HeaterSupply");
         }
-        if (error & 1 << 4) {
+        if (error & 1 << 4)
+        {
             printOLED("HeaterFault");
             Particle.publish("error", "HeaterFault");
         }
-        if (error & 1 << 3) {
+        if (error & 1 << 3)
+        {
             printOLED("MaxResistance");
             Particle.publish("error", "MaxResistance");
         }
-        if (error & 1 << 2) {
+        if (error & 1 << 2)
+        {
             printOLED("MeasModeInvalid");
             Particle.publish("error", "MeasModeInvalid");
         }
-        if (error & 1 << 1) {
+        if (error & 1 << 1)
+        {
             printOLED("ReadRegInvalid");
             Particle.publish("error", "ReadRegInvalid");
         }
-        if (error & 1 << 0) {
+        if (error & 1 << 0)
+        {
             printOLED("MsgInvalid");
             Particle.publish("error", "MsgInvalid");
         }
@@ -244,7 +273,8 @@ void clearOLED()
 }
 
 // Print values to OLED display
-void printIdleValuesToOLED(double f, double h) {
+void printIdleValuesToOLED(double f, double h)
+{
     if (useOLED)
     {
         clearOLED();
@@ -262,7 +292,8 @@ void printIdleValuesToOLED(double f, double h) {
 }
 
 // Print values to OLED display
-void printValuesToOLED(double f, double h, int voc) {
+void printValuesToOLED(double f, double h, int voc)
+{
     if (useOLED)
     {
         clearOLED();
